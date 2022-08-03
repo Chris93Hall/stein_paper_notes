@@ -1,0 +1,359 @@
+\documentclass[11pt]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+% Margins
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\title{ Notes on Stein's Effective SNR}
+\author{ Chris Hall }
+\date{\today}
+
+\begin{document}
+\maketitle  
+%\pagebreak
+
+% Optional TOC
+% \tableofcontents
+% \pagebreak
+
+%--Paper--
+
+%\section{Section 1}
+
+
+\section{Introduction}
+
+The post detection SNR is dependent on the SNRs of the input signals as well as the detection method used.
+The signal power and noise power of the received signals must be correctly propagated through every step of a detection system.
+
+Three detection methods will be analyzed.
+
+\begin{equation}
+r = \sum s_1(t) s_2^*(t)
+\end{equation}
+
+\begin{equation}
+r = |\sum s_1(t) s_2^*(t)|
+\end{equation}
+
+\begin{equation}
+r = \sum s_1(t)s_1(t-1) s_2^*(t) s_2^*(t-1)
+\end{equation}
+
+\section{Matched Filter Detection}
+
+Stein defines the output of a correlation at a time lag, $\tau=0$, as
+
+\begin{equation}
+r(t) = \sum s_1(t)s^{*}_2(t)
+\end{equation}
+
+
+We want to determine the SNR of the correlated signal. First let's start with something simple: a single sample. Note this assumption does not affect our final results. For sequences of a generalized length we would substitute $E_s = \sum s^2$ for $s^2$ in the derivations outlined below. The correlation then becomes
+
+\begin{equation}
+y = (s_1 + n_1)(s_2^* + n_2)
+\end{equation}
+
+\begin{equation}
+y = s_1 s^*_2 + s_1 n_2 + s_2 n_1 + n_1 n_2
+\end{equation}
+
+The first term is the signal term and the remaining three terms are noise terms. The SNR will be given as
+
+\begin{equation}
+\gamma = \frac{|s_1 s_2|^2}{\sigma_{n1}^2 |s_1|^2 + \sigma_{n2}^2 |s_2|^2 + \sigma_1^2 \sigma_2^2}
+\end{equation}
+
+The third term in the denominator is not obvious. I'm claiming that the product of two random variables has a variance equal to the product of the variances of the two random variables.
+
+\begin{equation}
+var (n_1 n_2) = E[n_1^2 n_2^2 - E[n_1 n_2]^2]
+\end{equation}
+
+If both $n_1$ and $n_2$ have a mean of zero then $E[n_1 n_2] = 0$.
+
+\begin{equation}
+var(n_1 n_2) = E[n_1^2 n_2^2] = E[n_1^2] [n_2^2] = \sigma_1^2\sigma_2^2
+\end{equation}
+
+Returning to the original problem, we can invert the fraction and decompose it into three terms.
+
+\begin{equation}
+\frac{1}{\gamma}
+=
+\frac{\sigma_{n1}^2 |s_1|^2 + \sigma_{n2} |s_2|^2 + \sigma_1^2 \sigma_2^2}{|s_1|^2 |s_2|^2}
+\end{equation}
+
+\begin{equation}
+\frac{1}{\gamma}
+=
+\frac{\sigma_1^2 |s_1|^2}{|s_1|^2 |s_2|^2}
++
+\frac{\sigma^2_2 s_2^2}{|s_1|^2 |s_2|^2}
++
+\frac{\sigma_1^2 \sigma_2^2}{|s_1|^2 |s_2|^2}
+\end{equation}
+
+\begin{equation}
+\frac{1}{\gamma}
+=
+\frac{\sigma_1^2}{|s_2|^2}
++
+\frac{\sigma^2_2}{|s_1|^2}
++
+\frac{\sigma_1^2 \sigma^2_2}{|s_1|^2 |s_2|^2}
+\end{equation}
+
+\begin{equation}
+\boxed{
+\frac{1}{\gamma}
+=
+\frac{1}{\gamma_1}
++
+\frac{1}{\gamma_2}
++
+\frac{1}{\gamma_1 \gamma_2}
+}
+\end{equation}
+
+If $s_1(t) = \alpha s_2(t)$ then
+
+\begin{equation}
+r = \sum s_1(t)s^{*}_2(t)
+\end{equation}
+
+will be purely real. The noise will still be complex, but only the real component of the noise will degrade our autocorrelation measurement. The real component of complex Gaussian noise contains half of the power of the complex Gaussian noise. This affects our effective SNR.
+
+\begin{equation}
+\boxed{
+\frac{1}{\gamma}
+=
+\frac{1}{2}
+\left(
+\frac{1}{\gamma_1}
++
+\frac{1}{\gamma_2}
++
+\frac{1}{\gamma_1 \gamma_2}
+\right)
+}
+\end{equation}
+
+This one half factor should only be used if we are dealing with complex signals and we know the phase relationship between them. If the original signals are real, we get no gain from looking at only the real component, and the one half factor should not be used. If we have signals with an unknown phase relationship, and our detection function involves taking a magnitude, then we can not benefit from coherent detection and the one half factor should not be used.
+
+\section{Non-Coherent Matched Filter Detection}
+
+\begin{equation}
+r(t) = \sum |s_1(t)s_2(t)|
+\end{equation}
+
+\begin{equation}
+\gamma = \frac{|s_1 s_2|^2}{var(|s_1 n_2 + s_2 n_1 + n_1 n_2|)}
+\end{equation}
+
+
+The first two terms in the denominator are Rayleigh distributed with variance
+
+\begin{equation}
+var(|s_1 n_2|) =
+\frac{4-\pi}{2} |s_1|^2 \sigma_{n2}^2
+\end{equation}
+
+
+\begin{equation}
+var(|s_1 n_2 + s_2 n_1|) =
+\frac{4-\pi}{2}
+\left(|s_1|^2 \sigma_{n2}^2 + |s_2|^2 \sigma_{n1}^2 \right)
+\end{equation}
+
+For a minute let's claim that the third term in the denominator is insignificant compared to the other two, due to some assumption about the relative powers of $n_1$ and $n_2$.
+
+\begin{equation}
+\gamma = \frac{|s_1|^2 |s_2|^2}{\left( \frac{4-\pi}{2}\right) \left( |s_1|^2 \sigma_{n2}^2 + |s_2|^2 \sigma_{n1}^2 \right)}
+\end{equation}
+
+
+\begin{equation}
+\gamma = \frac{2|s_1|^2 |s_2|^2}{\left( 4-\pi \right) \left( |s_1|^2 \sigma_{n2}^2 + |s_2|^2 \sigma_{n1}^2 \right)}
+\end{equation}
+
+
+\begin{equation}
+\frac{1}{\gamma}
+=
+\frac{(4-\pi)(|s_1|^2 \sigma_{n2}^2)}{2|s_1|^2 |s_2|^2}
++
+\frac{(4-\pi)(|s_2|^2\sigma_{n1}^2)}{2|s_1|^2 |s_2|^2}
+\end{equation}
+
+
+\begin{equation}
+\frac{1}{\gamma}
+=
+\frac{(4-\pi)\sigma_{n2}^2}{|s_2|^2}
++
+\frac{(4-\pi)\sigma_{n1}^2}{2|s_1|^2}
+\end{equation}
+
+\begin{equation}
+\boxed{
+\frac{1}{\gamma}
+=
+\frac{4-\pi}{2}
+\left(
+\frac{1}{\gamma_1} + \frac{1}{\gamma_2}
+\right)
+}
+\end{equation}
+
+
+Now let's go back to the case where the third term is not negligible. 
+
+\begin{equation}
+\gamma = \frac{|s_1 s_2|^2}{var(|s_1 n_2 + s_2 n_1 + n_1 n_2|)}
+\end{equation}
+
+Using the triangle inequality
+
+\begin{equation}
+\gamma \geq \frac{|s_1 s_2|^2}{var(|s_1 n_2 + s_2 n_1|) + var(|n_1 n_2|)}
+\end{equation}
+
+\begin{equation}
+\gamma \geq \frac{|s_1 s_2|^2}{
+\left(
+\frac{4-\pi}{2}
+\right)
+\left(
+|s_1|^2 \sigma_{n2}^2 + |s_2|^2 \sigma_{n1}^2
+\right)
+ +
+0.38 \sigma_{n1}^2 \sigma_{n2}^2}
+\end{equation}
+
+
+\begin{equation}
+\frac{1}{\gamma}
+\leq
+\frac{\left( 4-\pi \right) |s_1|^2 \sigma_{n2}^2}
+{2|s_1|^2|s_2|^2}
++
+\frac{\left( 4-\pi \right) |s_2|^2 \sigma_{n1}^2}
+{2|s_1|^2|s_2|^2}
++
+\frac{0.38\sigma_{n1}^2 \sigma_{n2}^2}
+{|s_1|^2|s_2|^2}
+\end{equation}
+
+
+\begin{equation}
+\frac{1}{\gamma}
+\leq
+\frac{\left( 4-\pi \right) \sigma_{n2}^2}
+{2|s_2|^2}
++
+\frac{\left( 4-\pi \right) \sigma_{n1}^2}
+{2|s_1|^2}
++
+\frac{0.38\sigma_{n1}^2 \sigma_{n2}^2}
+{|s_1|^2|s_2|^2}
+\end{equation}
+
+
+\begin{equation}
+\boxed{
+\frac{1}{\gamma}
+\leq
+\frac{4-\pi}
+{2 \gamma_1}
++
+\frac{4-\pi}
+{2 \gamma_2}
++
+\frac{0.38}
+{\gamma_1 \gamma_2}
+}
+\end{equation}
+
+
+\section{Differential Matched Filter Detection}
+
+
+\begin{equation}
+r = \sum s_1(t)s_1(t-1) s_2^*(t) s_2^*(t-1)
+\end{equation}
+
+
+\begin{equation}
+\gamma
+=
+\frac{P_s}{P_n}
+\end{equation}
+
+\begin{equation}
+P_s = |s_1(t)s_1(t-1)s_2(t)s_2(t-1)|^2
+\end{equation}
+
+\begin{align}
+P_n = var(s_{11}s_{12}s_{21}n_{22} + s_{11}s_{12}s_{22}n_{21} + s_{11}s_{12}n_{21}n_{22}\\
+  + s_{11}n_{12}s_{21}s_{22} + s_{11}n_{12}s_{21}n_{22} + s_{11}n_{12}s_{22}n_{21} + s_{11}n_{12}n_{21}n_{22}\\
+  + s_{12}n_{11}s_{21}s_{22} + s_{12}n_{11}s_{21}n_{22} + s_{12}n_{11}s_{22}n_{21} + s_{12}n_{11}n_{21}n_{22}\\
+  + n_{11}n_{12}s_{21}s_{22} + n_{11}n_{12}s_{21}n_{22} + n_{11}n_{12}s_{22}n_{21} + n_{11}n_{12}n_{21}n_{22})
+\end{align}
+
+Where $s_{11} = s_1(t)$, $s_{12} = s_1(t-1)$, $s_{21} = s_2(t)$, $s_{22} = s_2(t-1)$, $n_{11} = n_1(t)$, $n_{12} = n_1(t-1)$, $n_{21} = n_2(t)$, and $n_{22} = n_2(t-1)$.
+
+%\begin{equation}
+%s_{11} = s_1(t)
+%\end{equation}
+
+%\begin{equation}
+%s_{12} = s_1(t-1)
+%\end{equation}
+
+%\begin{equation}
+%s_{21} = s_2(t)
+%\end{equation}
+
+%\begin{equation}
+%s_{22} = s_2(t-1)
+%\end{equation}
+
+%\begin{equation}
+%n_{11} = n_1(t)
+%\end{equation}
+
+%\begin{equation}
+%n_{12} = n_1(t-1)
+%\end{equation}
+
+%\begin{equation}
+%n_{21} = n_2(t)
+%\end{equation}
+
+%\begin{equation}
+%n_{22} = n_2(t-1)
+%\end{equation}
+
+
+This is probably easier to figure out experimentally. It is tempting to start aggressively canceling out terms that appear in both the numerator and the denominator. However, this would require invoking the Cauchy-Schwarz inequality.
+
+\section{Conclusion}
+
+Although these results allow us to calculate a post detection SNR, or at least a lower bound on SNR, we should be careful about using this value to calculate probability of detection or probability of false alarm metrics. The noise statistics are not purely Gaussian, or complex Gaussian, or Rayleigh distributed. When selecting a detection threshold, the actual probability distribution of the post detection data should be used.
+
+In our results we make an implicit assumption that signal two and signal one are scaled versions of each other. That is $S_1(t) = \alpha s_2(t)$. This allows us to avoid the Cauchy-Schwarz inequality by guaranteeing it is actually an equality. The following simplification is made based on this assumption: $|s_1(t)s_2(t)|^2 = |s_1(t)|^2|s_2(t)|^2$. This assumption falls apart if $s_2(t)$ is not a scaled and rotated copy of $s_1(t)$.
+
+The assumption also falls apart if there is a lag between $s_1(t)$ and $s_2(t)$. The work above deals with computing the output SNR for the time instant where both signals align perfectly. The implication of this is that Signal to Noise Ratio is not constant over a CAF. This should make intuitive sense given that the post detection signal magnitude is not constant over the CAF.
+
+%--/Paper--
+
+\end{document}
