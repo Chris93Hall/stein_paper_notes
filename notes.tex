@@ -468,6 +468,34 @@ var(\hat{t} - \tau)
 
 Applying Parseval's theorem, we get
 
+\begin{equation}
+var(t-\tau)
+\geq
+\left[ \frac{2}{N_0} \int^{\infty}_{-\infty} \omega^2 |S_r(i\omega )|^2 df \right]^{-1}
+\end{equation}
+
+Received signal energy is
+
+\begin{equation}
+E_r = \int^\frac{T}{2}_\frac{-T}{2} s_r^2(t)dt = \int^\infty_{-\infty} |S_r(i\omega)|^2 df
+\end{equation}
+
+\begin{equation}
+\beta^2 = \frac{1}{E_r} \int^\infty_{-\infty} \omega^2 |S_r(i\omega)|^2 df
+\end{equation}
+
+\begin{equation}
+var(\hat{\tau} - \tau)
+\geq
+\frac{1}{(2E_r/N_0)\beta^2}
+\end{equation}
+
+
+\begin{equation}
+var(\hat{\tau} - \tau)
+\geq
+\frac{1}{2\gamma\beta^2}
+\end{equation}
 
 
 \section{Conclusion}
