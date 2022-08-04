@@ -347,6 +347,129 @@ Where $s_{11} = s_1(t)$, $s_{12} = s_1(t-1)$, $s_{21} = s_2(t)$, $s_{22} = s_2(t
 
 This is probably easier to figure out experimentally. It is tempting to start aggressively canceling out terms that appear in both the numerator and the denominator. However, this would require invoking the Cauchy-Schwarz inequality.
 
+\section{Derivation of Stein's TDOA Accuracy}
+
+\begin{equation}
+r(t) = s_r(t|x) + n(t)
+\end{equation}
+
+Here $x$ represents any unknown parameters in the signal, $s$. These unknown parameters could be amplitude, phase, or time offset. In our case we are interested in examining signals with an unknown time offset.
+
+\begin{equation}
+\bar{r}(t) = E[r(t)] = s_r(t|x)
+\end{equation}
+
+The likelihood function will be
+
+\begin{equation}
+p(r|x) 
+=
+\alpha \exp \{ - \left( \frac{1}{N_0} \right) \int^T_0 \left[ r(t) - s_r(t|x) \right]^2 dt \}
+\end{equation}
+
+
+The maximum likelihood estimate comes from setting the derivative of the log likelihood function equal to zero.
+
+\begin{equation}
+\frac{\partial \left[ \ln p(r|x) \right]}{\partial x}
+= 0
+\end{equation}
+
+\begin{equation}
+\frac{2}{N_0} \int^T_0 \left[ r(t) - s_r(t|x)\right]
+\left[ \frac{\partial s_r(t|x)}{\partial x} \right] dt = 0
+\end{equation}
+
+Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=(N_0/2)\sigma(t-t')$.
+
+The Fisher information matrix has elements
+
+\begin{equation}
+F_{ij}
+=
+\left( \frac{2}{N_0} \right)^2
+\int^T_0 \int^T_0
+\left( \frac{N_0}{2} \right)
+\delta (t - t')
+\left[ \partial s_r(t|x)/\partial x_i \right]
+\left[ \partial s_r(t|x)/\partial x_j \right]
+dt dt'
+\end{equation}
+
+\begin{equation}
+F_{ij}
+=
+\frac{2}{N_0}
+\int^T_0
+\left[ \partial s_r(t|x)/\partial x_i \right]
+\left[ \partial s_r(t|x)/\partial x_j \right]
+dt
+\end{equation}
+
+Now we can substitute $\tau$ for $x$ since we are trying to estimate the time delay.
+
+\begin{equation}
+s_r(t|x) = s_r(t|\tau) = s_r(t-\tau)
+\end{equation}
+
+
+\begin{equation}
+\int^\frac{T}{2}_\frac{-T}{2}
+ \left[ r(t) - s_r(t-\tau)\right]
+\left[ \frac{\partial s_r(t-\tau)}{\partial x} \right] dt = 0
+\end{equation}
+
+The second term reduces to zero.
+
+\begin{equation}
+- \int^\frac{T}{2}_\frac{T}{2}
+s_r(t-\tau)
+\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt
+\end{equation}
+
+
+\begin{equation}
+=-\int^{\frac{T}{2}-\tau}_{\frac{-T}{2}-\tau}
+s_r(u)
+\left[ \frac{\partial s_r(u)}{\partial u} \right] du
+\end{equation}
+
+\begin{equation}
+=\frac{1}{2} \int^{\frac{T}{2}-\tau}_{\frac{-T}{2}-\tau}
+\left[ \frac{\partial s_r^2(u)}{\partial u} \right] du
+\end{equation}
+
+\begin{equation}
+=\frac{1}{2}[s_r^2(T/2-\tau) - s_r^2(-T/2-\tau)] = \frac{1}{2}[s_r^2(T/2) - s_r^2(-T/2)] = 0
+\end{equation}
+
+The maximum likelihood estimate, $\hat{\tau}$ , is the value of $\tau$ for which
+
+\begin{equation}
+\int^\frac{T}{2}_\frac{T}{2}
+r(t)
+\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt = 0
+\end{equation}
+
+The Cramer Rao Lower Bound for the variance of this estimator is
+
+\begin{equation}
+var(\hat{t} - \tau)
+\geq
+\left[
+\frac{2}{N_0}
+\int^\frac{T}{2}_\frac{-T}{2} \left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right]^2 dt \right]^{-1}
+\end{equation}
+
+
+\begin{equation}
+= \left[ \frac{2}{N_0} \int^\frac{T}{2}_\frac{-T}{2} \left[ \frac{\partial s_r(t)}{\partial t} \right]^2 dt \right]^{-1}
+\end{equation}
+
+Applying Parseval's theorem, we get
+
+
+
 \section{Conclusion}
 
 Although these results allow us to calculate a post detection SNR, or at least a lower bound on SNR, we should be careful about using this value to calculate probability of detection or probability of false alarm metrics. The noise statistics are not purely Gaussian, or complex Gaussian, or Rayleigh distributed. When selecting a detection threshold, the actual probability distribution of the post detection data should be used.
