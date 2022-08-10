@@ -3,6 +3,11 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 
+\def\Var{{\textrm{Var}}\,}
+\def\Det{{\textrm{Det}}\,}
+\def\E{{\textrm{E}}\,}
+\def\Cov{{\textrm{Cov}}\,}
+
 % Margins
 \topmargin=-0.45in
 \evensidemargin=0in
@@ -75,13 +80,13 @@ The first term is the signal term and the remaining three terms are noise terms.
 The third term in the denominator is not obvious. I'm claiming that the product of two random variables has a variance equal to the product of the variances of the two random variables.
 
 \begin{equation}
-var (n_1 n_2) = E[n_1^2 n_2^2 - E[n_1 n_2]^2]
+var (n_1 n_2) = \E[n_1^2 n_2^2 - \E[n_1 n_2]^2]
 \end{equation}
 
-If both $n_1$ and $n_2$ have a mean of zero then $E[n_1 n_2] = 0$.
+If both $n_1$ and $n_2$ have a mean of zero then $\E[n_1 n_2] = 0$.
 
 \begin{equation}
-var(n_1 n_2) = E[n_1^2 n_2^2] = E[n_1^2] [n_2^2] = \sigma_1^2\sigma_2^2
+var(n_1 n_2) = \E[n_1^2 n_2^2] = \E[n_1^2] \E[n_2^2] = \sigma_1^2\sigma_2^2
 \end{equation}
 
 Returning to the original problem, we can invert the fraction and decompose it into three terms.
@@ -218,13 +223,13 @@ For a minute let's claim that the third term in the denominator is insignificant
 Now let's go back to the case where the third term is not negligible. 
 
 \begin{equation}
-\gamma = \frac{|s_1 s_2|^2}{var(|s_1 n_2 + s_2 n_1 + n_1 n_2|)}
+\gamma = \frac{|s_1 s_2|^2}{\Var(|s_1 n_2 + s_2 n_1 + n_1 n_2|)}
 \end{equation}
 
 Using the triangle inequality
 
 \begin{equation}
-\gamma \geq \frac{|s_1 s_2|^2}{var(|s_1 n_2 + s_2 n_1|) + var(|n_1 n_2|)}
+\gamma \geq \frac{|s_1 s_2|^2}{\Var(|s_1 n_2 + s_2 n_1|) + \Var(|n_1 n_2|)}
 \end{equation}
 
 \begin{equation}
@@ -347,10 +352,36 @@ Where $s_{11} = s_1(t)$, $s_{12} = s_1(t-1)$, $s_{21} = s_2(t)$, $s_{22} = s_2(t
 
 This is probably easier to figure out experimentally. It is tempting to start aggressively canceling out terms that appear in both the numerator and the denominator. However, this would require invoking the Cauchy-Schwarz inequality.
 
-\section{Derivation of Stein's TDOA Accuracy}
+
+\section{Derivation of Stein's Time of Arrival Accuracy and the Maximum Likelihood Estimator}
 
 \begin{equation}
 r(t) = s_r(t|x) + n(t)
+\end{equation}
+
+For the case where $n(t)$ is additive white Gaussian noise, the probability distribution of $r(t)$ is
+
+\begin{equation}
+p_i(r)
+=
+\frac{(2\pi)^\frac{m}{2}}{\sqrt{\Det(C)}}
+\exp \left[ -\frac{1}{2} (r-s_i)^T C^{-1} (r-s_i) \right]
+\end{equation}
+
+$C$ is the covariance matrix for the random noise component, which will be diagonal: $\frac{2\Delta t}{N_0}$.  The sample period is $\Delta t$.
+
+\begin{equation}
+p(r)
+=
+\left( \frac{\Delta t}{\pi N_0} \right)^\frac{m}{2}
+\exp \left[ -\frac{\Delta t}{N_0} \sum (r - s_r)^2 \right]
+\end{equation}
+
+Where $m$ is the number of samples in the signal and the summation is taken over the $m$ samples. 
+To get the continuous time signal model, we will take the limit as sample period, $\Delta t$, goes to zero.
+
+\begin{equation}
+p(r) = \exp \left[ -\left(\frac{1}{N_0}\right) \int^T_0 \left[ r(t) - s_r(t) \right]^2 dt \right]
 \end{equation}
 
 Here $x$ represents any unknown parameters in the signal, $s$. These unknown parameters could be amplitude, phase, or time offset. In our case we are interested in examining signals with an unknown time offset.
@@ -380,33 +411,7 @@ The maximum likelihood estimate comes from setting the derivative of the log lik
 \left[ \frac{\partial s_r(t|x)}{\partial x} \right] dt = 0
 \end{equation}
 
-Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=(N_0/2)\sigma(t-t')$.
-
-The Fisher information matrix has elements
-
-\begin{equation}
-F_{ij}
-=
-\left( \frac{2}{N_0} \right)^2
-\int^T_0 \int^T_0
-\left( \frac{N_0}{2} \right)
-\delta (t - t')
-\left[ \partial s_r(t|x)/\partial x_i \right]
-\left[ \partial s_r(t|x)/\partial x_j \right]
-dt dt'
-\end{equation}
-
-\begin{equation}
-F_{ij}
-=
-\frac{2}{N_0}
-\int^T_0
-\left[ \partial s_r(t|x)/\partial x_i \right]
-\left[ \partial s_r(t|x)/\partial x_j \right]
-dt
-\end{equation}
-
-Now we can substitute $\tau$ for $x$ since we are trying to estimate the time delay.
+Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=(N_0/2)\delta(t-t')$.
 
 \begin{equation}
 s_r(t|x) = s_r(t|\tau) = s_r(t-\tau)
@@ -446,15 +451,80 @@ s_r(u)
 The maximum likelihood estimate, $\hat{\tau}$ , is the value of $\tau$ for which
 
 \begin{equation}
-\int^\frac{T}{2}_\frac{T}{2}
+\int^\frac{T}{2}_\frac{-T}{2}
 r(t)
 \left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt = 0
 \end{equation}
 
-The Cramer Rao Lower Bound for the variance of this estimator is
+
+\subsection{Fisher Information and Estimator Variance}
+
+
+The Cramer Rao lower bound is a lower bound on the variance of an estimator, given by:
 
 \begin{equation}
-var(\hat{t} - \tau)
+\Cov(\hat{x}(y))
+\geq
+\left[I + \frac{\partial b(x)}{\partial x}\right]^T F^{-1}(x) \left[I + \frac{\partial b(x)}{\partial x}\right]
+\end{equation}
+
+Where $F$ is the Fisher information matrix. For an unbiased estimator, the bias term $b(x)$ will be zero, and the equation simplifies to
+
+\begin{equation}
+\Cov(\hat{x}(y))
+\geq
+F^{-1}(x)
+\end{equation}
+
+In our case the Fisher information matrix consists of only one element since there is only one unknown variable to be estimated, $\tau$. The Fisher information matrix is calculated as
+
+\begin{equation}
+F(x) = E\left[ \frac{\partial \ln [p(y|x)]}{\partial x} \right]^T
+\left[ \frac{\partial \ln [p(y|x)]}{\partial x} \right]
+\end{equation}
+
+\begin{equation}
+\frac{\partial \ln [p(y|x)]}{\partial x} 
+=
+\int^\frac{T}{2}_\frac{-T}{2}
+\left[ r(t) - s_r(t) \right]
+\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt
+\end{equation}
+
+Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=\frac{N_0}{2}\delta(t-t')$.
+
+
+The Fisher information matrix has elements
+
+\begin{equation}
+F_{ij}
+=
+\left( \frac{2}{N_0} \right)^2
+\int^\frac{T}{2}_\frac{-T}{2} \int^\frac{T}{2}_\frac{-T}{2}
+\left( \frac{N_0}{2} \right)
+\delta (t - t')
+\left[ \frac{\partial s_r(t|x)}{\partial x_i} \right]
+\left[ \frac{\partial s_r(t|x)}{\partial x_j} \right]
+dt dt'
+\end{equation}
+
+\begin{equation}
+F_{ij}
+=
+\frac{2}{N_0}
+\int^\frac{T}{2}_\frac{-T}{2}
+\left[ \frac{\partial s_r(t|x)}{\partial x_i} \right]
+\left[ \frac{\partial s_r(t|x)}{\partial x_j} \right]
+dt
+\end{equation}
+
+There is only one unknown, $\tau$, that we are interested in estimating, so our Fisher information matrix will only have one element, $\tau = x_i = x_j$. Now we can substitute $\tau$ for $x$ since we are trying to estimate the time delay.
+
+
+The Cramer Rao Lower Bound is
+
+\begin{equation}
+\Var(\hat{t} - \tau)
 \geq
 \left[
 \frac{2}{N_0}
@@ -469,7 +539,7 @@ var(\hat{t} - \tau)
 Applying Parseval's theorem, we get
 
 \begin{equation}
-var(t-\tau)
+\Var(t-\tau)
 \geq
 \left[ \frac{2}{N_0} \int^{\infty}_{-\infty} \omega^2 |S_r(i\omega )|^2 df \right]^{-1}
 \end{equation}
@@ -485,18 +555,24 @@ E_r = \int^\frac{T}{2}_\frac{-T}{2} s_r^2(t)dt = \int^\infty_{-\infty} |S_r(i\om
 \end{equation}
 
 \begin{equation}
-var(\hat{\tau} - \tau)
+\Var(\hat{\tau} - \tau)
 \geq
 \frac{1}{(2E_r/N_0)\beta^2}
 \end{equation}
 
+The noise power is given as $\sigma_n^2 = \frac{N_0B}{2}$. Signal power is $P_r = \frac{E_r}{T}$. SNR will then be $\gamma = \frac{2E_r}{N_0BT}$
 
 \begin{equation}
-var(\hat{\tau} - \tau)
+\boxed{
+\Var(\hat{\tau} - \tau)
 \geq
-\frac{1}{2\gamma\beta^2}
+\frac{1}{\gamma BT\beta^2}
+}
 \end{equation}
 
+
+
+\section{Derivation of Stein's Frequency of Arrival Accuracy and the Maximum Likelihood Estimator}
 
 \section{Conclusion}
 
