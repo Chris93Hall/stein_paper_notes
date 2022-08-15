@@ -16,7 +16,7 @@
 \textheight=9.0in
 \headsep=0.25in
 
-\title{ Notes on Stein's Effective SNR}
+\title{ Notes on Stein's Ambiguity Function Processing}
 \author{ Chris Hall }
 \date{\today}
 
@@ -219,8 +219,7 @@ For a minute let's claim that the third term in the denominator is insignificant
 }
 \end{equation}
 
-
-Now let's go back to the case where the third term is not negligible. 
+The solution above is valid for the case where one of our correlated signals is clean, or has infinite SNR. Now let's go back to the case where the third term is not negligible. 
 
 \begin{equation}
 \gamma = \frac{|s_1 s_2|^2}{\Var(|s_1 n_2 + s_2 n_1 + n_1 n_2|)}
@@ -570,9 +569,6 @@ The noise power is given as $\sigma_n^2 = \frac{N_0B}{2}$. Signal power is $P_r 
 }
 \end{equation}
 
-
-
-\section{Derivation of Stein's Frequency of Arrival Accuracy and the Maximum Likelihood Estimator}
 
 \section{Conclusion}
 
