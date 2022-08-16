@@ -35,8 +35,10 @@
 
 \section{Introduction}
 
-The post detection SNR is dependent on the SNRs of the input signals as well as the detection method used.
-The signal power and noise power of the received signals must be correctly propagated through every step of a detection system.
+Section two of these notes contains the missing derivation for the Time of Arrival estimator variance stated in Stein's Algorithms for Ambiguity Function processing.
+
+The remaining sections deal with Stein's definition of effective SNR, and how effective SNR changes depending on the detection method employed.
+To correctly calculate the effective SNR, the signal power and noise power of the received signals must be correctly propagated through every step of a detection system.
 
 Three detection methods will be analyzed.
 
@@ -51,6 +53,230 @@ r = |\sum s_1(t) s_2^*(t)|
 \begin{equation}
 r = \sum s_1(t)s_1(t-1) s_2^*(t) s_2^*(t-1)
 \end{equation}
+
+
+\section{Derivation of Stein's Time of Arrival Accuracy and the Maximum Likelihood Estimator}
+
+Most of this derivation is pieced together from chapters $6$ and $10$ of Robert McDonough's "Detection of Signals in Noise" second edition.
+
+We start by defining a noisy received signal:
+
+
+\begin{equation}
+r(t) = s_r(t|x) + n(t)
+\end{equation}
+
+For the case where $n(t)$ is additive white Gaussian noise, the probability distribution of $r(t)$ is
+
+\begin{equation}
+p_i(r)
+=
+\frac{(2\pi)^\frac{m}{2}}{\sqrt{\Det(C)}}
+\exp \left[ -\frac{1}{2} (r-s_i)^T C^{-1} (r-s_i) \right]
+\end{equation}
+
+$C$ is the covariance matrix for the random noise component, which will be diagonal: $\frac{2\Delta t}{N_0}$.  The sample period is $\Delta t$.
+
+\begin{equation}
+p(r)
+=
+\left( \frac{\Delta t}{\pi N_0} \right)^\frac{m}{2}
+\exp \left[ -\frac{\Delta t}{N_0} \sum (r - s_r)^2 \right]
+\end{equation}
+
+Where $m$ is the number of samples in the signal and the summation is taken over the $m$ samples. 
+To get the continuous time signal model, we will take the limit as sample period, $\Delta t$, goes to zero.
+
+\begin{equation}
+p(r) = \exp \left[ -\left(\frac{1}{N_0}\right) \int^T_0 \left[ r(t) - s_r(t) \right]^2 dt \right]
+\end{equation}
+
+Here $x$ represents any unknown parameters in the signal, $s$. These unknown parameters could be amplitude, phase, or time offset. In our case we are interested in examining signals with an unknown time offset.
+
+\begin{equation}
+\bar{r}(t) = E[r(t)] = s_r(t|x)
+\end{equation}
+
+The likelihood function will be
+
+\begin{equation}
+p(r|x) 
+=
+\alpha \exp \{ - \left( \frac{1}{N_0} \right) \int^T_0 \left[ r(t) - s_r(t|x) \right]^2 dt \}
+\end{equation}
+
+
+The maximum likelihood estimate comes from setting the derivative of the log likelihood function equal to zero.
+
+\begin{equation}
+\frac{\partial \left[ \ln p(r|x) \right]}{\partial x}
+= 0
+\end{equation}
+
+\begin{equation}
+\frac{2}{N_0} \int^T_0 \left[ r(t) - s_r(t|x)\right]
+\left[ \frac{\partial s_r(t|x)}{\partial x} \right] dt = 0
+\end{equation}
+
+Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=(N_0/2)\delta(t-t')$.
+
+\begin{equation}
+s_r(t|x) = s_r(t|\tau) = s_r(t-\tau)
+\end{equation}
+
+
+\begin{equation}
+\int^\frac{T}{2}_\frac{-T}{2}
+ \left[ r(t) - s_r(t-\tau)\right]
+\left[ \frac{\partial s_r(t-\tau)}{\partial x} \right] dt = 0
+\end{equation}
+
+The second term reduces to zero.
+
+\begin{equation}
+- \int^\frac{T}{2}_\frac{T}{2}
+s_r(t-\tau)
+\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt
+\end{equation}
+
+
+\begin{equation}
+=-\int^{\frac{T}{2}-\tau}_{\frac{-T}{2}-\tau}
+s_r(u)
+\left[ \frac{\partial s_r(u)}{\partial u} \right] du
+\end{equation}
+
+\begin{equation}
+=\frac{1}{2} \int^{\frac{T}{2}-\tau}_{\frac{-T}{2}-\tau}
+\left[ \frac{\partial s_r^2(u)}{\partial u} \right] du
+\end{equation}
+
+\begin{equation}
+=\frac{1}{2}[s_r^2(T/2-\tau) - s_r^2(-T/2-\tau)] = \frac{1}{2}[s_r^2(T/2) - s_r^2(-T/2)] = 0
+\end{equation}
+
+The maximum likelihood estimate, $\hat{\tau}$ , is the value of $\tau$ for which
+
+\begin{equation}
+\int^\frac{T}{2}_\frac{-T}{2}
+r(t)
+\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt = 0
+\end{equation}
+
+
+\subsection{Fisher Information and Estimator Variance}
+
+
+The Cramer Rao lower bound is a lower bound on the variance of an estimator, given by:
+
+\begin{equation}
+\Cov(\hat{x}(y))
+\geq
+\left[I + \frac{\partial b(x)}{\partial x}\right]^T F^{-1}(x) \left[I + \frac{\partial b(x)}{\partial x}\right]
+\end{equation}
+
+Where $F$ is the Fisher information matrix. For an unbiased estimator, the bias term $b(x)$ will be zero, and the equation simplifies to
+
+\begin{equation}
+\Cov(\hat{x}(y))
+\geq
+F^{-1}(x)
+\end{equation}
+
+In our case the Fisher information matrix consists of only one element since there is only one unknown variable to be estimated, $\tau$. The Fisher information matrix is calculated as
+
+\begin{equation}
+F(x) = E\left[ \frac{\partial \ln [p(y|x)]}{\partial x} \right]^T
+\left[ \frac{\partial \ln [p(y|x)]}{\partial x} \right]
+\end{equation}
+
+\begin{equation}
+\frac{\partial \ln [p(y|x)]}{\partial x} 
+=
+\int^\frac{T}{2}_\frac{-T}{2}
+\left[ r(t) - s_r(t) \right]
+\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt
+\end{equation}
+
+Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=\frac{N_0}{2}\delta(t-t')$.
+
+
+The Fisher information matrix has elements
+
+\begin{equation}
+F_{ij}
+=
+\left( \frac{2}{N_0} \right)^2
+\int^\frac{T}{2}_\frac{-T}{2} \int^\frac{T}{2}_\frac{-T}{2}
+\left( \frac{N_0}{2} \right)
+\delta (t - t')
+\left[ \frac{\partial s_r(t|x)}{\partial x_i} \right]
+\left[ \frac{\partial s_r(t|x)}{\partial x_j} \right]
+dt dt'
+\end{equation}
+
+\begin{equation}
+F_{ij}
+=
+\frac{2}{N_0}
+\int^\frac{T}{2}_\frac{-T}{2}
+\left[ \frac{\partial s_r(t|x)}{\partial x_i} \right]
+\left[ \frac{\partial s_r(t|x)}{\partial x_j} \right]
+dt
+\end{equation}
+
+There is only one unknown, $\tau$, that we are interested in estimating, so our Fisher information matrix will only have one element, $\tau = x_i = x_j$. Now we can substitute $\tau$ for $x$ since we are trying to estimate the time delay.
+
+
+The Cramer Rao Lower Bound is
+
+\begin{equation}
+\Var(\hat{t} - \tau)
+\geq
+\left[
+\frac{2}{N_0}
+\int^\frac{T}{2}_\frac{-T}{2} \left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right]^2 dt \right]^{-1}
+\end{equation}
+
+
+\begin{equation}
+= \left[ \frac{2}{N_0} \int^\frac{T}{2}_\frac{-T}{2} \left[ \frac{\partial s_r(t)}{\partial t} \right]^2 dt \right]^{-1}
+\end{equation}
+
+Applying Parseval's theorem, we get
+
+\begin{equation}
+\Var(t-\tau)
+\geq
+\left[ \frac{2}{N_0} \int^{\infty}_{-\infty} \omega^2 |S_r(i\omega )|^2 df \right]^{-1}
+\end{equation}
+
+Received signal energy is
+
+\begin{equation}
+E_r = \int^\frac{T}{2}_\frac{-T}{2} s_r^2(t)dt = \int^\infty_{-\infty} |S_r(i\omega)|^2 df
+\end{equation}
+
+\begin{equation}
+\beta^2 = \frac{1}{E_r} \int^\infty_{-\infty} \omega^2 |S_r(i\omega)|^2 df
+\end{equation}
+
+\begin{equation}
+\Var(\hat{\tau} - \tau)
+\geq
+\frac{1}{(2E_r/N_0)\beta^2}
+\end{equation}
+
+The noise power is given as $\sigma_n^2 = \frac{N_0B}{2}$. Signal power is $P_r = \frac{E_r}{T}$. SNR will then be $\gamma = \frac{2E_r}{N_0BT}$
+
+\begin{equation}
+\boxed{
+\Var(\hat{\tau} - \tau)
+\geq
+\frac{1}{\gamma BT\beta^2}
+}
+\end{equation}
+
 
 \section{Matched Filter Detection}
 
@@ -352,225 +578,7 @@ Where $s_{11} = s_1(t)$, $s_{12} = s_1(t-1)$, $s_{21} = s_2(t)$, $s_{22} = s_2(t
 This is probably easier to figure out experimentally. It is tempting to start aggressively canceling out terms that appear in both the numerator and the denominator. However, this would require invoking the Cauchy-Schwarz inequality.
 
 
-\section{Derivation of Stein's Time of Arrival Accuracy and the Maximum Likelihood Estimator}
-
-\begin{equation}
-r(t) = s_r(t|x) + n(t)
-\end{equation}
-
-For the case where $n(t)$ is additive white Gaussian noise, the probability distribution of $r(t)$ is
-
-\begin{equation}
-p_i(r)
-=
-\frac{(2\pi)^\frac{m}{2}}{\sqrt{\Det(C)}}
-\exp \left[ -\frac{1}{2} (r-s_i)^T C^{-1} (r-s_i) \right]
-\end{equation}
-
-$C$ is the covariance matrix for the random noise component, which will be diagonal: $\frac{2\Delta t}{N_0}$.  The sample period is $\Delta t$.
-
-\begin{equation}
-p(r)
-=
-\left( \frac{\Delta t}{\pi N_0} \right)^\frac{m}{2}
-\exp \left[ -\frac{\Delta t}{N_0} \sum (r - s_r)^2 \right]
-\end{equation}
-
-Where $m$ is the number of samples in the signal and the summation is taken over the $m$ samples. 
-To get the continuous time signal model, we will take the limit as sample period, $\Delta t$, goes to zero.
-
-\begin{equation}
-p(r) = \exp \left[ -\left(\frac{1}{N_0}\right) \int^T_0 \left[ r(t) - s_r(t) \right]^2 dt \right]
-\end{equation}
-
-Here $x$ represents any unknown parameters in the signal, $s$. These unknown parameters could be amplitude, phase, or time offset. In our case we are interested in examining signals with an unknown time offset.
-
-\begin{equation}
-\bar{r}(t) = E[r(t)] = s_r(t|x)
-\end{equation}
-
-The likelihood function will be
-
-\begin{equation}
-p(r|x) 
-=
-\alpha \exp \{ - \left( \frac{1}{N_0} \right) \int^T_0 \left[ r(t) - s_r(t|x) \right]^2 dt \}
-\end{equation}
-
-
-The maximum likelihood estimate comes from setting the derivative of the log likelihood function equal to zero.
-
-\begin{equation}
-\frac{\partial \left[ \ln p(r|x) \right]}{\partial x}
-= 0
-\end{equation}
-
-\begin{equation}
-\frac{2}{N_0} \int^T_0 \left[ r(t) - s_r(t|x)\right]
-\left[ \frac{\partial s_r(t|x)}{\partial x} \right] dt = 0
-\end{equation}
-
-Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=(N_0/2)\delta(t-t')$.
-
-\begin{equation}
-s_r(t|x) = s_r(t|\tau) = s_r(t-\tau)
-\end{equation}
-
-
-\begin{equation}
-\int^\frac{T}{2}_\frac{-T}{2}
- \left[ r(t) - s_r(t-\tau)\right]
-\left[ \frac{\partial s_r(t-\tau)}{\partial x} \right] dt = 0
-\end{equation}
-
-The second term reduces to zero.
-
-\begin{equation}
-- \int^\frac{T}{2}_\frac{T}{2}
-s_r(t-\tau)
-\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt
-\end{equation}
-
-
-\begin{equation}
-=-\int^{\frac{T}{2}-\tau}_{\frac{-T}{2}-\tau}
-s_r(u)
-\left[ \frac{\partial s_r(u)}{\partial u} \right] du
-\end{equation}
-
-\begin{equation}
-=\frac{1}{2} \int^{\frac{T}{2}-\tau}_{\frac{-T}{2}-\tau}
-\left[ \frac{\partial s_r^2(u)}{\partial u} \right] du
-\end{equation}
-
-\begin{equation}
-=\frac{1}{2}[s_r^2(T/2-\tau) - s_r^2(-T/2-\tau)] = \frac{1}{2}[s_r^2(T/2) - s_r^2(-T/2)] = 0
-\end{equation}
-
-The maximum likelihood estimate, $\hat{\tau}$ , is the value of $\tau$ for which
-
-\begin{equation}
-\int^\frac{T}{2}_\frac{-T}{2}
-r(t)
-\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt = 0
-\end{equation}
-
-
-\subsection{Fisher Information and Estimator Variance}
-
-
-The Cramer Rao lower bound is a lower bound on the variance of an estimator, given by:
-
-\begin{equation}
-\Cov(\hat{x}(y))
-\geq
-\left[I + \frac{\partial b(x)}{\partial x}\right]^T F^{-1}(x) \left[I + \frac{\partial b(x)}{\partial x}\right]
-\end{equation}
-
-Where $F$ is the Fisher information matrix. For an unbiased estimator, the bias term $b(x)$ will be zero, and the equation simplifies to
-
-\begin{equation}
-\Cov(\hat{x}(y))
-\geq
-F^{-1}(x)
-\end{equation}
-
-In our case the Fisher information matrix consists of only one element since there is only one unknown variable to be estimated, $\tau$. The Fisher information matrix is calculated as
-
-\begin{equation}
-F(x) = E\left[ \frac{\partial \ln [p(y|x)]}{\partial x} \right]^T
-\left[ \frac{\partial \ln [p(y|x)]}{\partial x} \right]
-\end{equation}
-
-\begin{equation}
-\frac{\partial \ln [p(y|x)]}{\partial x} 
-=
-\int^\frac{T}{2}_\frac{-T}{2}
-\left[ r(t) - s_r(t) \right]
-\left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right] dt
-\end{equation}
-
-Note that $r(t) - s_r(t|x) = n(t)$ and $E[n(t)n(t')]=R_n(t-t')=\frac{N_0}{2}\delta(t-t')$.
-
-
-The Fisher information matrix has elements
-
-\begin{equation}
-F_{ij}
-=
-\left( \frac{2}{N_0} \right)^2
-\int^\frac{T}{2}_\frac{-T}{2} \int^\frac{T}{2}_\frac{-T}{2}
-\left( \frac{N_0}{2} \right)
-\delta (t - t')
-\left[ \frac{\partial s_r(t|x)}{\partial x_i} \right]
-\left[ \frac{\partial s_r(t|x)}{\partial x_j} \right]
-dt dt'
-\end{equation}
-
-\begin{equation}
-F_{ij}
-=
-\frac{2}{N_0}
-\int^\frac{T}{2}_\frac{-T}{2}
-\left[ \frac{\partial s_r(t|x)}{\partial x_i} \right]
-\left[ \frac{\partial s_r(t|x)}{\partial x_j} \right]
-dt
-\end{equation}
-
-There is only one unknown, $\tau$, that we are interested in estimating, so our Fisher information matrix will only have one element, $\tau = x_i = x_j$. Now we can substitute $\tau$ for $x$ since we are trying to estimate the time delay.
-
-
-The Cramer Rao Lower Bound is
-
-\begin{equation}
-\Var(\hat{t} - \tau)
-\geq
-\left[
-\frac{2}{N_0}
-\int^\frac{T}{2}_\frac{-T}{2} \left[ \frac{\partial s_r(t-\tau)}{\partial \tau} \right]^2 dt \right]^{-1}
-\end{equation}
-
-
-\begin{equation}
-= \left[ \frac{2}{N_0} \int^\frac{T}{2}_\frac{-T}{2} \left[ \frac{\partial s_r(t)}{\partial t} \right]^2 dt \right]^{-1}
-\end{equation}
-
-Applying Parseval's theorem, we get
-
-\begin{equation}
-\Var(t-\tau)
-\geq
-\left[ \frac{2}{N_0} \int^{\infty}_{-\infty} \omega^2 |S_r(i\omega )|^2 df \right]^{-1}
-\end{equation}
-
-Received signal energy is
-
-\begin{equation}
-E_r = \int^\frac{T}{2}_\frac{-T}{2} s_r^2(t)dt = \int^\infty_{-\infty} |S_r(i\omega)|^2 df
-\end{equation}
-
-\begin{equation}
-\beta^2 = \frac{1}{E_r} \int^\infty_{-\infty} \omega^2 |S_r(i\omega)|^2 df
-\end{equation}
-
-\begin{equation}
-\Var(\hat{\tau} - \tau)
-\geq
-\frac{1}{(2E_r/N_0)\beta^2}
-\end{equation}
-
-The noise power is given as $\sigma_n^2 = \frac{N_0B}{2}$. Signal power is $P_r = \frac{E_r}{T}$. SNR will then be $\gamma = \frac{2E_r}{N_0BT}$
-
-\begin{equation}
-\boxed{
-\Var(\hat{\tau} - \tau)
-\geq
-\frac{1}{\gamma BT\beta^2}
-}
-\end{equation}
-
-
-\section{Conclusion}
+\section{Concluding Thoughts}
 
 Although these results allow us to calculate a post detection SNR, or at least a lower bound on SNR, we should be careful about using this value to calculate probability of detection or probability of false alarm metrics. The noise statistics are not purely Gaussian, or complex Gaussian, or Rayleigh distributed. When selecting a detection threshold, the actual probability distribution of the post detection data should be used.
 
