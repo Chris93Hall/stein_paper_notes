@@ -280,6 +280,61 @@ The noise power is given as $\sigma_n^2 = \frac{N_0B}{2}$. Signal power is $P_r 
 \end{equation}
 
 
+\section{Time of Arrival Accuracy in Discrete Time}
+
+\begin{equation}
+p(r) = \left( \frac{\Delta t}{\pi N_0}\right)^{\frac{m}{2}}
+\exp \{ \frac{-\Delta t}{N_0} \sum (r(t) - s_r(t))^2\}
+\end{equation}
+
+\begin{equation}
+p(r|x) = \left( \frac{\Delta t}{\pi N_0}\right)^{\frac{m}{2}}
+\exp \{ \frac{-\Delta t}{N_0} \sum (r(t) - s_r(t|x))^2\}
+\end{equation}
+
+\begin{equation}
+\frac{\partial \ln (p(r|x))}
+{\partial x}
+= 0
+\end{equation}
+
+\begin{equation}
+\frac{m}{2}
+\ln \left( \frac{\Delta t}{\pi N_0} \right)
+-
+\frac{\Delta t}{N_0}
+\sum (r(t) - s_r(t|x))^2
+\frac{\partial}{\partial x}
+= 0
+\end{equation}
+
+\begin{equation}
+\frac{-2 \Delta t}{N_0}
+\sum (r(t) - s_r(t|x))
+\left( \frac{\partial s_r(t|x)}{\partial x} \right) = 0
+\end{equation}
+
+Recall that $s_r(t|x)$ is actually $s_r(t-\tau)$
+
+\begin{equation}
+\frac{-2 \Delta t}{N_0}
+\sum (r(t) - s_r(t-\tau))
+\left( \frac{\partial s_r(t-\tau)}{\partial \tau} \right) = 0
+\end{equation}
+
+The second term in the equation above equals $0$.
+
+\begin{equation}
+\frac{-2 \Delta t}{N_0}
+\sum r(t) \frac{\Delta s_r(t-\tau)}{\partial \tau}
+= 0
+\end{equation}
+
+\subsection{Fisher Information and Estimator Variance}
+
+TODO
+
+
 \section{Matched Filter Detection}
 
 Stein defines the output of a correlation at a time lag, $\tau=0$, as
