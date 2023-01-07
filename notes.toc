@@ -1,0 +1,12 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{}%
+\contentsline {section}{\numberline {2}Derivation of Stein's Time of Arrival Accuracy and the Maximum Likelihood Estimator}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Fisher Information and Estimator Variance}{4}{}%
+\contentsline {section}{\numberline {3}Time of Arrival Accuracy in Discrete Time}{6}{}%
+\contentsline {subsection}{\numberline {3.1}Fisher Information and Estimator Variance}{6}{}%
+\contentsline {section}{\numberline {4}Other Bounds on Time of Arrival Variance}{6}{}%
+\contentsline {subsection}{\numberline {4.1}The Barankin Bounds}{6}{}%
+\contentsline {subsection}{\numberline {4.2}The Ziv-Zakai Lower Bound}{7}{}%
+\contentsline {section}{\numberline {5}Matched Filter Detection}{8}{}%
+\contentsline {section}{\numberline {6}Non-Coherent Matched Filter Detection}{9}{}%
+\contentsline {section}{\numberline {7}Differential Matched Filter Detection}{10}{}%
+\contentsline {section}{\numberline {8}Concluding Thoughts}{11}{}%

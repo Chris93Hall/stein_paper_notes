@@ -2,11 +2,13 @@
 
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{verbatim}
 
 \def\Var{{\textrm{Var}}\,}
 \def\Det{{\textrm{Det}}\,}
 \def\E{{\textrm{E}}\,}
 \def\Cov{{\textrm{Cov}}\,}
+\def\SNR{{\textrm{SNR}}\,}
 
 % Margins
 \topmargin=-0.45in
@@ -22,15 +24,11 @@
 
 \begin{document}
 \maketitle  
-%\pagebreak
+\pagebreak
 
 % Optional TOC
-% \tableofcontents
-% \pagebreak
-
-%--Paper--
-
-%\section{Section 1}
+\tableofcontents
+\pagebreak
 
 
 \section{Introduction}
@@ -334,6 +332,187 @@ The second term in the equation above equals $0$.
 
 TODO
 
+
+\section{Other Bounds on Time of Arrival Variance}
+
+\subsection{The Barankin Bounds}
+
+\begin{verbatim}
+https://aranne5.bgu.ac.il/others/PinkusAlon.pdf
+\end{verbatim}
+
+The Barankin Bound on estimator variance is a stricter bound than the Cramer Rao Lower Bound, but converges to the CRLB at higher SNRs. However, at lower SNRs it deviates from the CRLB significantly. The SNR at which the bounds deviate is signal dependent, and is a useful metric for detemining if accurate time of arrival estimation will be possible.
+
+\begin{equation}
+\Cov(\hat{\theta}) \geq
+T(B-1^T)^{-1} T^T
+\end{equation}
+
+$T$ is a testpoint vector. It contains points to be tested. The selected points should be ones that are likely to cause issues, such as the sidelobe peaks.
+
+\begin{equation}
+T = \left[ \theta_1 - \theta, \theta_2 - \theta, ..., \theta_N - \theta \right]
+\end{equation}
+
+Where $\theta = \left[ \tau_i, f_{Di} \right]$.
+
+\begin{equation}
+B_{ij} =
+\exp
+\left[
+\frac{2}{\sigma^2}
+Re \left[
+E - |AF(\tau_i - \tau, f_{Di} - f_D)|^2
+- |AF(\tau - \tau_j, f_D - f_{Dj})|^2
++ AF^*(\tau - \tau_j, f_D - f_{Dj})AF^*(\tau_i - \tau, f_{Di} - f_D)
+AF(\tau_i - \tau_j, f_{Di} - f_{Dj})
+e^{-j2\pi(f_{Di} - f_D)(\tau - tau_j)}
+\right]
+\right]
+\end{equation}
+
+\subsection{The Ziv-Zakai Lower Bound}
+
+The Ziv-Zakai Lower Bound (ZZLB) has been reduced to a closed form solution for both the narrowband and wideband time of arrival estimation scenatios. 
+
+\begin{verbatim}
+https://ieeexplore-ieee-org.ezproxy4.library.arizona.edu/stamp/stamp.jsp?tp=&arnumber=1164061
+\end{verbatim}
+
+\begin{verbatim}
+https://ieeexplore-ieee-org.ezproxy4.library.arizona.edu/stamp/stamp.jsp?tp=&arnumber=1164429&tag=1
+\end{verbatim}
+
+For the narrowband case
+
+\begin{equation}
+SNR_1 =
+\frac{72}{WT/2\pi}
+\left(
+\frac{\omega_0}{W}
+\right)^2
+\frac{1}{(\omega_0 D)^2}
+\end{equation}
+
+\begin{equation}
+SNR_2 =
+\frac{2.17}{\pi^2(WT/2\pi)}
+\left(
+\frac{\omega_0}{W}
+\right)^2
+\end{equation}
+
+\begin{equation}
+SNR_3 =
+\frac{6}{\pi^2(WT/2\pi)}
+\left(
+\frac{\omega_0}{W}
+\right)^2
+\left[
+\phi^{-1}
+\left(
+\frac{W^2}{24\omega^2_0}
+\right)
+\right]^2
+\end{equation}
+
+where
+
+\begin{equation}
+\phi (x) = \frac{1}{\sqrt{2\pi}}
+\int^\infty_x
+e^{-t^2/2}dt
+\end{equation}
+
+The first region is completely noise dominated and the error can be modeled as a uniform distribution over the domain of considered values. The first region is lower bounded by
+
+\begin{equation}
+\Cov(\hat{\tau} - \tau) = \frac{D^2}{12}
+\end{equation}
+
+The next region is where ambiguity related errors due to the autocorrelation sidelobes dominate the error.
+
+\begin{equation}
+\Cov(\hat{\tau} - \tau) =  \frac{12\pi}{W^3T\SNR}
+\end{equation}
+
+The third region is an exponential dropoff between the Barankin Region and the Cramer Rao Lower Bound Region. In the Cramer Rao Lower Bound Region, the error variance is given by
+
+\begin{equation}
+\Cov(\hat{\tau} - \tau) = 
+\frac{\pi}
+{WT\omega^2\SNR}
+\end{equation}
+
+
+For wideband signals, the regions are slightly different.
+
+\begin{equation}
+\SNR_1 =
+\left(
+\frac{2\pi}{WT}
+\right)
+\left(
+\frac{2.76}{\pi^2}
+\right)
+\left(
+\frac{\omega}{W}
+\right)^2
+\end{equation}
+
+\begin{equation}
+\SNR_2 =
+\left(
+\frac{2\pi}{WT}
+\right)
+\left(
+\frac{6}{\pi^2}
+\right)
+\left(
+\frac{\omega}{W}
+\right)^2
+\left[
+\theta^{-1}
+\left(
+\frac{W^2}24\omega^2{}
+\right)
+\right]^2
+\end{equation}
+
+\begin{equation}
+\SNR_3 =
+\left(
+\frac{2\pi}{WT}
+\right)
+\left(
+\frac{0.92}{2}
+\right)
+\end{equation}
+
+\begin{equation}
+\SNR_4 =
+\left(
+\frac{2\pi}{WT}
+\right)
+\end{equation}
+
+\begin{equation}
+\Var(\hat{\tau}) = \frac{D^2}{12}
+\end{equation}
+
+\begin{equation}
+\Var(\hat{\tau} - \tau) =
+\frac{1}{4}
+\left(
+\frac{2\pi}{\omega_L} + \frac{1}{2\sqrt{2}W\SNR}
+\right)^2
+\end{equation}
+
+\begin{equation}
+\Var(\hat{\tau} - \tau) =
+\frac{\pi}
+{\SNR (\omega^2 + W^2/12)}
+\end{equation}
 
 \section{Matched Filter Detection}
 
